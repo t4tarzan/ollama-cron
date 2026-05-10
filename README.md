@@ -1,8 +1,8 @@
 # ollama-cron
 
-> Cron, but for AI. Schedule prompts to run anywhere — local Ollama, Claude, GPT — with output to file, webhook, or email.
+> Cron, but for AI. Schedule prompts to run anywhere with output to file, webhook, or email.
 
-**Status:** v0.1 — planning. Not yet released.
+**Status:** v0.1 — in development.
 
 **Sovereignty:** sovereign-by-construction. BYO endpoint, BYO key, BYO model.
 A local-only configuration is documented and tested.
@@ -14,22 +14,39 @@ Best-effort community shovel — no SLA, no roadmap commitments.
 
 ## What this is
 
-Cron, but for AI. Schedule prompts to run anywhere — local Ollama, Claude, GPT — with output to file, webhook, or email.
+Cron, but for AI. Schedule prompts to run anywhere with output to file, webhook, or email.
 
 ## What this isn't
 
-Not n8n. Not an agent platform. Not a workflow builder. SCHEDULED PROMPTS ONLY.
+See [PRD-v1.md](./PRD-v1.md) for the full anti-scope definition.
 
 ## Install
 
-> Coming with v0.1 release.
+### From package manager (when v0.1 ships)
+
+```bash
+cargo install ollama-cron
+```
+
+### Build from source
+
+```bash
+git clone https://github.com/sovereign-shovels/ollama-cron.git
+cd ollama-cron
+```
+# Build release binary
+cargo build --release
+
+# Or install directly
+cargo install --path .
+```
 
 ## Configure
 
 You bring the model. By default `ollama-cron` tries to use a local provider:
 
 - For LLM endpoints: Ollama at `http://localhost:11434`
-- For voice endpoints: configurable, see [docs/configure.md]
+- For voice endpoints: configurable, see docs
 
 To use any other provider (Claude, GPT, Hermes, OpenRouter, Sarvam, etc.):
 
@@ -46,7 +63,7 @@ LM Studio, and vLLM all work via their OpenAI-compatible endpoints.
 
 ## Why this exists
 
-Self-hosters and power users want scheduled AI tasks: a daily news brief from their RSS, a weekly summary of a watched repo, an hourly check on a feed. n8n is too heavy. Cron is too primitive (no LLM call). ollama-cron sits between: cron syntax, OpenAI-compatible call, output to file/webhook/email.
+See [PRD-v1.md](./PRD-v1.md) for the problem statement and rationale.
 
 ## What's next
 
