@@ -1,0 +1,26 @@
+[package]
+name = "ollama-cron"
+version = "0.1.0"
+edition = "2021"
+authors = ["Sovereign Shovels <github.com/sovereign-shovels>"]
+license = "Apache-2.0"
+description = "Cron, but for AI. Schedule prompts to run anywhere."
+repository = "https://github.com/sovereign-shovels/ollama-cron"
+rust-version = "1.75"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+cron = "0.15"
+reqwest = { version = "0.12", features = ["json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+toml = "0.8"
+chrono = "0.4"
+dirs = "5"
+anyhow = "1"
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true

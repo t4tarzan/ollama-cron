@@ -1,73 +1,130 @@
 # ollama-cron
 
-> Cron, but for AI. Schedule prompts to run anywhere with output to file, webhook, or email.
+> Cron, but for AI. Schedule prompts to run anywhere — local Ollama, Claude, GPT — with output to file, webhook, or email.
 
-**Status:** v0.1 — in development.
+**Status:** v0.1 — ready to use.
 
-**Sovereignty:** sovereign-by-construction. BYO endpoint, BYO key, BYO model.
-A local-only configuration is documented and tested.
-
-This is a community project, **not affiliated with Ollama**.
-Best-effort community shovel — no SLA, no roadmap commitments.
+**Sovereignty:** sovereign-by-construction. Works with local Ollama by default. BYO endpoint, BYO key.
 
 ---
 
 ## What this is
 
-Cron, but for AI. Schedule prompts to run anywhere with output to file, webhook, or email.
+Self-hosters and power users want scheduled AI tasks: a daily news brief from their RSS, a weekly summary of a watched repo, an hourly check on a feed. n8n is too heavy. Cron is too primitive (no LLM call). ollama-cron sits between: cron syntax, OpenAI-compatible call, output to file/webhook.
 
 ## What this isn't
 
+- Not an agent platform
+- Not a workflow builder
+- Not n8n
+- Scheduled prompts only
+
 See [PRD-v1.md](./PRD-v1.md) for the full anti-scope definition.
+
+---
 
 ## Install
 
-### From package manager (when v0.1 ships)
+### From source
 
-```bash
-cargo install ollama-cron
-```
-
-### Build from source
+**Prerequisites:**
+- [Rust](https://rustup.rs/) 1.75+
 
 ```bash
 git clone https://github.com/sovereign-shovels/ollama-cron.git
 cd ollama-cron
-```
-# Build release binary
+
+# Build
 cargo build --release
 
-# Or install directly
-cargo install --path .
+# The binary is at target/release/ollama-cron
 ```
 
-## Configure
+---
 
-You bring the model. By default `ollama-cron` tries to use a local provider:
+## Usage
 
-- For LLM endpoints: Ollama at `http://localhost:11434`
-- For voice endpoints: configurable, see docs
+### Initialize config
 
-To use any other provider (Claude, GPT, Hermes, OpenRouter, Sarvam, etc.):
+```bash
+ollama-cron init
+# Creates ~/.config/ollama-cron/config.toml with sample jobs
+```
+
+### Edit config
 
 ```toml
-# ~/.config/ollama-cron/config.toml
-[provider]
-endpoint = "https://api.your-provider.com/v1"
-api_key_env = "YOUR_PROVIDER_KEY"
-model = "your-model-name"
+endpoint = "http://localhost:11434/v1/chat/completions"
+model = "llama3.2"
+
+[[job]]
+name = "daily-brief"
+schedule = "0 8 * * *"
+prompt = "Give me a 3-bullet summary of today's AI news. Date: {{date}}"
+output = "file:///tmp/daily-brief.txt"
+
+[[job]]
+name = "hourly-check"
+schedule = "0 * * * *"
+prompt = "What time is it?"
+output = "https://hooks.example.com/endpoint"
 ```
 
-Anthropic, OpenAI, and Sarvam endpoints all work. Local Ollama, llama.cpp,
-LM Studio, and vLLM all work via their OpenAI-compatible endpoints.
+**Schedule format:** Standard cron (`min hour day month weekday`)
+
+**Variables:** `{{date}}`, `{{datetime}}`
+
+### List jobs
+
+```bash
+ollama-cron list
+```
+
+### Run a job immediately
+
+```bash
+ollama-cron run daily-brief
+```
+
+### Start the daemon
+
+```bash
+ollama-cron daemon
+```
+
+Runs continuously, executing jobs on their schedules.
+
+### Output sinks
+
+- **File:** `output = "file:///path/to/output.txt"` or `output = "/path/to/output.txt"`
+- **Webhook:** `output = "https://hooks.example.com/endpoint"`
+
+### Using cloud providers
+
+```toml
+endpoint = "https://api.anthropic.com/v1/messages"
+api_key_env_var = "ANTHROPIC_API_KEY"
+model = "claude-3-5-sonnet-20241022"
+```
+
+Any OpenAI-compatible endpoint works (Ollama, OpenAI, Anthropic, OpenRouter, etc.).
+
+---
 
 ## Why this exists
 
-See [PRD-v1.md](./PRD-v1.md) for the problem statement and rationale.
+Nobody owns this exact niche. n8n is heavier; cron is more primitive; this sits between.
+
+See [PRD-v1.md](./PRD-v1.md) for the full problem statement and rationale.
 
 ## What's next
 
-See [PRD-v1.md](./PRD-v1.md) for the full v0.1 → v0.5 → v1.0 plan.
+- **v0.5:** Web UI for schedule management, job history, conditional re-runs, templates
+- **v1.0:** Multi-step pipelines, job dependencies, notification routing
+
+See [PRD-v1.md](./PRD-v1.md) for the full roadmap.
+
+---
 
 ## License
 
@@ -75,9 +132,6 @@ Apache 2.0. See [LICENSE](./LICENSE).
 
 ## Part of sovereign-shovels
 
-This repo is part of the [sovereign-shovels](https://github.com/sovereign-shovels)
-portfolio of small, focused, sovereign-by-construction AI utilities.
+This repo is part of the [sovereign-shovels](https://github.com/sovereign-shovels) portfolio of small, focused, sovereign-by-construction AI utilities.
 
-Other shovels: claude-vault, bulbul-studio, saaras-tray, claude-prompts,
-ollama-cron, mcp-forge, sarvam-pdf, agent-console, sarvam-meet, obsidian-llm,
-llm-diff, claude-bridge, claude-radio, sarvam-cast.
+Other shovels: claude-vault, bulbul-studio, saaras-tray, claude-prompts, ollama-cron, mcp-forge, sarvam-pdf, agent-console, sarvam-meet, obsidian-llm, llm-diff, claude-bridge, claude-radio, sarvam-cast.
