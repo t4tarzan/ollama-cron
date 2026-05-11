@@ -8,6 +8,23 @@
 
 ---
 
+## Architecture
+
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────────┐
+│  config.toml│────▶│   ollama-    │────▶│   Ollama /      │
+│  (cron jobs)│     │   cron       │     │   OpenAI-compat │
+└─────────────┘     │  (scheduler) │     │   endpoint      │
+                    └──────────────┘     └─────────────────┘
+                           │
+              ┌────────────┼────────────┐
+              ▼            ▼            ▼
+        ┌─────────┐  ┌─────────┐  ┌─────────┐
+        │  File   │  │ Webhook │  │  stdout │
+        │ output  │  │  POST   │  │  (run)  │
+        └─────────┘  └─────────┘  └─────────┘
+```
+
 ## What this is
 
 Self-hosters and power users want scheduled AI tasks: a daily news brief from their RSS, a weekly summary of a watched repo, an hourly check on a feed. n8n is too heavy. Cron is too primitive (no LLM call). ollama-cron sits between: cron syntax, OpenAI-compatible call, output to file/webhook.
@@ -93,6 +110,17 @@ ollama-cron daemon
 ```
 
 Runs continuously, executing jobs on their schedules.
+
+**Demo output:**
+```
+$ ollama-cron init
+Created sample config at: ~/.config/ollama-cron/config.toml
+
+$ ollama-cron run test-job
+Running job 'test-job'...
+
+4
+```
 
 ### Output sinks
 
